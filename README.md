@@ -14,6 +14,8 @@ Muitas vezes, desenvolvedores começam a trabalhar em uma tarefa sem ter todas a
 
 ## ✨ Funcionalidades Principais
 
+- **Autenticação de Usuários**: Sistema de cadastro e login para acesso à plataforma
+- **Sessões Personalizadas**: Cada usuário pode criar e gerenciar suas próprias sessões de questionário
 - **Questionário Dinâmico Multi-etapas**: Cada resposta revela a próxima pergunta, baseada nas escolhas anteriores
 - **Perguntas Condicionais**: O fluxo de perguntas se adapta ao tipo de tarefa selecionado
 - **Tipos de Tarefa**: Suporte para Features, Bugs e Refactors
@@ -26,12 +28,15 @@ Muitas vezes, desenvolvedores começam a trabalhar em uma tarefa sem ter todas a
 
 A aplicação utiliza uma estrutura de árvore de decisão onde:
 
-1. **Primeira Pergunta**: O usuário seleciona o tipo de tarefa (Feature, Bug ou Refactor)
-2. **Perguntas Condicionais**: Baseado na seleção, novas perguntas aparecem dinamicamente
+1. **Autenticação**: O usuário precisa se cadastrar e fazer login para acessar a plataforma
+2. **Criação de Sessão**: Após o login, o usuário pode criar uma nova sessão de questionário
+3. **Primeira Pergunta**: O usuário seleciona o tipo de tarefa (Feature, Bug ou Refactor)
+4. **Perguntas Condicionais**: Baseado na seleção, novas perguntas aparecem dinamicamente
    - Para **Feature**: "A UX/UI já está definida?", "Existem dependências de backend?", "Há casos extremos ou estados de erro identificados?"
    - Para **Bug**: Perguntas sobre reprodução, ambiente, impacto, etc.
    - Para **Refactor**: Perguntas sobre escopo, testes, documentação, etc.
-3. **Resultado Final**: Um resumo das respostas que ajuda a clarificar a tarefa antes de começar a codificar
+5. **Resultado Final**: Um resumo das respostas que ajuda a clarificar a tarefa antes de começar a codificar
+6. **Histórico**: O usuário pode visualizar e gerenciar todas as suas sessões anteriores
 
 ---
 
@@ -62,7 +67,11 @@ Antes de começar, certifique-se de ter instalado:
    npm install
    ```
 
-3. **Execute o servidor de desenvolvimento**:
+3. **Configure as variáveis de ambiente**:
+
+   Crie um arquivo `.env.local` na raiz do projeto com as variáveis necessárias (consulte a documentação de autenticação para mais detalhes).
+
+4. **Execute o servidor de desenvolvimento**:
 
    ```bash
    pnpm dev
@@ -70,8 +79,11 @@ Antes de começar, certifique-se de ter instalado:
    npm run dev
    ```
 
-4. **Abra no navegador**:
+5. **Abra no navegador**:
    Acesse [http://localhost:3000](http://localhost:3000) para ver a aplicação em execução.
+
+6. **Cadastre-se e faça login**:
+   Na primeira visita, você precisará criar uma conta. Após o cadastro e login, você terá acesso às suas sessões de questionário.
 
 ### Build para Produção
 
@@ -80,6 +92,8 @@ Para criar uma build de produção:
 ```bash
 pnpm build
 pnpm start
+```
+
 ---
 
 ## 🛠️ Stack Tecnológica
@@ -88,7 +102,17 @@ pnpm start
 - **React 19** - Biblioteca para construção de interfaces
 - **TypeScript** - Tipagem estática para JavaScript
 - **Tailwind CSS** - Framework CSS utilitário
+- **Prisma** - ORM para acesso ao banco de dados
 - **ESLint** - Linter para qualidade de código
+
+### Autenticação
+
+A aplicação utiliza autenticação para garantir que cada usuário tenha acesso apenas às suas próprias sessões de questionário. O sistema de autenticação permite:
+
+- Cadastro de novos usuários
+- Login seguro
+- Gerenciamento de sessões de usuário
+- Proteção de rotas e dados
 
 ---
 
@@ -131,4 +155,3 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 ## 🙏 Agradecimentos
 
 Este projeto foi criado para ajudar desenvolvedores front-end a terem mais clareza e confiança antes de começar uma tarefa. Se você encontrar útil, considere dar uma ⭐ no repositório!
-```
