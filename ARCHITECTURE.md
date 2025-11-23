@@ -719,4 +719,106 @@ Ao gerar ou modificar código neste repositório, garanta:
 
 ---
 
+---
+
+## Instruções
+
+Esta seção define **como qualquer ferramenta de IA deve agir** ao gerar ou alterar código neste repositório.
+
+Sempre que uma IA estiver sendo usada como pair programmer neste projeto (`frontend-task-compass`), siga **rigorosamente** as regras abaixo:
+
+1. **Leitura obrigatória**
+
+   - Antes de sugerir, criar ou modificar qualquer código, a IA deve considerar todo o conteúdo deste `ARCHITECTURE.md` como **fonte da verdade**.
+   - Caso exista dúvida sobre onde colocar algo (pasta, camada, módulo), a IA deve tomar a decisão com base nas seções:
+     - [Camadas e Filosofia Geral](#camadas-e-filosofia-geral)
+     - [Estrutura de Diretórios](#estrutura-de-diretórios)
+     - [Detalhes das Camadas DDD](#detalhes-das-camadas-ddd)
+     - [Acesso a Dados e Server Actions](#acesso-a-dados-e-server-actions)
+     - [Formulários e Validação](#formulários-e-validação)
+     - [Client vs Server (Next.js)](#client-vs-server-nextjs)
+     - [Requisições Client-side com TanStack Query](#requisições-client-side-com-tanstack-query)
+     - [Lógica de Negócio e Hooks Customizados](#lógica-de-negócio-e-hooks-customizados)
+     - [Convenções de Tipagem e Estilo de Código](#convenções-de-tipagem-e-estilo-de-código)
+     - [Pasta Shared](#pasta-shared)
+     - [Índices / Barrel Files](#índices--barrel-files)
+
+2. **Regras obrigatórias ao gerar código**
+
+   A IA **DEVE SEMPRE** garantir que o código gerado:
+
+   - Siga a arquitetura modular com DDD “light”:
+     - Cada funcionalidade em um módulo dentro de `src/modules/<modulo>/` com as camadas `domain/`, `application/`, `infra/`, `ui/`.
+   - Use **Server Actions** para qualquer acesso ao banco de dados (via Prisma), nunca diretamente em componentes client-side.
+   - Use **React Hook Form + Zod** para qualquer formulário no front-end:
+     - Schemas de validação em `ui/validation/`.
+     - Lógica de formulário e submit em **hooks customizados**, não dentro do componente.
+   - Evite ao máximo client-side no Next:
+     - Prefira Server Components.
+     - Só usar `'use client'` quando realmente necessário.
+   - Para requisições client-side, use **TanStack Query**:
+     - Criar serviços em `ui/services/`.
+     - Criar um hook customizado que consome esses serviços com React Query.
+   - Nunca colocar lógica de negócio em componentes ou páginas:
+     - Lógica em **hooks customizados** (UI) ou em casos de uso / serviços de domínio.
+   - Componentes que não possuem lógica acima do retorno devem usar a forma enxuta:
+     - `const Component = () => (<h1>Hello</h1>)`
+   - Tipagem:
+     - Nada de `any`, salvo casos extremamente necessários (e ainda assim, evitar).
+     - Não declarar tipos ou interfaces inline em componentes/páginas.
+     - Tipos e interfaces em arquivos separados (por exemplo `*.types.ts` ou pasta `types/` do módulo).
+     - Todo componente/página que recebe props deve usar um tipo/interface terminando com `Props` (ex: `QuestionCardProps`).
+     - Todo enum deve terminar com `Enum` (ex: `TaskTypeEnum`).
+   - Código sem “code smell”:
+     - Evitar hardcode de valores em regras de negócio.
+     - Extrair strings/números relevantes para constantes (ex: arquivos em `constants/`).
+   - Idioma:
+     - Todo código (nomes de arquivos, variáveis, funções, tipos) em **inglês**.
+     - Textos exibidos para o usuário (labels, mensagens, títulos) em **português**.
+   - Sem comentários no código:
+     - A IA **não deve gerar comentários** (`//` ou `/** */`) a menos que o desenvolvedor peça explicitamente.
+
+3. **Barrel files (index.ts)**
+
+   - Sempre que criar múltiplos arquivos em uma pasta como `components/`, `hooks/`, `services/`, `utils/` etc., a IA deve:
+     - Criar ou atualizar um `index.ts` exportando tudo que é público naquele nível.
+   - Imports devem preferir esses barrels, e não caminhos profundos.
+
+4. **Resolução de conflitos com pedidos do usuário**
+
+   - Se o pedido do usuário entrar em conflito com qualquer regra deste `ARCHITECTURE.md`, a IA deve:
+     - Explicar claramente qual regra seria quebrada.
+     - Sugerir uma alternativa que **respeite** a arquitetura definida.
+
+5. **Comportamento padrão ao receber tarefas**
+
+   Quando o usuário pedir algo como:
+
+   - “Cria um novo hook para…”
+   - “Implementa um componente para…”
+   - “Adiciona um caso de uso para…”
+   - “Cria um serviço para…”
+   - “Implementa uma nova rota/página…”
+
+   A IA deve, por padrão:
+
+   1. Identificar o **módulo** correto (por exemplo, `questionnaire`).
+   2. Escolher a **camada** apropriada (`domain`, `application`, `infra`, `ui` ou `shared`).
+   3. Criar/alterar:
+      - Entidades, value objects, repositórios ou serviços de domínio apenas em `domain/`.
+      - Casos de uso, DTOs e erros de aplicação apenas em `application/`.
+      - Implementações Prisma, mappers e integrações externas em `infra/`.
+      - Componentes, hooks, server actions, serviços client-side e validações em `ui/`.
+      - Utilitários genéricos, componentes base, hooks genéricos e constantes compartilhadas em `shared/`.
+   4. Garantir que:
+      - Tipos estejam separados.
+      - Nomenclatura siga os sufixos `Props` e `Enum`.
+      - Barrel files sejam atualizados.
+      - Nenhuma lógica de negócio fique presa em componentes/páginas.
+
+---
+
+> Ao trabalhar neste repositório, sempre leia e siga este `ARCHITECTURE.md`.  
+> Toda geração ou modificação de código deve respeitar, sem exceção, as regras e padrões definidos neste documento.
+
 **Este documento é a fonte da verdade para arquitetura e convenções. Todo código deve aderir a estas regras.**
