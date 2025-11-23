@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskTypeEnum {
+  FEATURE
+  BUG
+  REFACTOR
+}
+
+enum QuestionTypeEnum {
+  MULTIPLE_CHOICE
+  YES_NO
+  TEXT
+}
+
+enum TaskSessionStatusEnum {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  taskSessions  TaskSession[]
+}
+
+model TaskSession {
+  id          String                 @id @default(cuid())
+  userId      String
+  taskType    TaskTypeEnum
+  status      TaskSessionStatusEnum  @default(IN_PROGRESS)
+  title       String?
+  description String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  answers     Answer[]
+  user        User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([taskType])
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  text            String
+  type            QuestionTypeEnum
+  order           Int
+  isInitial       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  options         Option[] @relation("QuestionOptions")
+  answers         Answer[]
+  nextQuestionFor Option[] @relation("OptionNextQuestion")
+
+  @@index([order])
+  @@index([isInitial])
+}
+
+model Option {
+  id              String    @id @default(cuid())
+  questionId      String
+  text            String
+  order           Int
+  nextQuestionId  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  question        Question  @relation("QuestionOptions", fields: [questionId], references: [id], onDelete: Cascade)
+  nextQuestion    Question? @relation("OptionNextQuestion", fields: [nextQuestionId], references: [id], onDelete: SetNull)
+  answers         Answer[]
+
+  @@index([questionId])
+  @@index([nextQuestionId])
+}
+
+model Answer {
+  id          String       @id @default(cuid())
+  sessionId   String
+  questionId  String
+  optionId    String?
+  textValue   String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  session     TaskSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question    Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option      Option?      @relation(fields: [optionId], references: [id], onDelete: SetNull)
+
+  @@unique([sessionId, questionId])
+  @@index([sessionId])
+  @@index([questionId])
+  @@index([optionId])
+}
+
