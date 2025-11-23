@@ -14,9 +14,10 @@ Este documento descreve a arquitetura geral do projeto **Frontend Task Compass**
 6. [Client vs Server (Next.js)](#client-vs-server-nextjs)
 7. [Requisições Client-side com TanStack Query](#requisições-client-side-com-tanstack-query)
 8. [Lógica de Negócio e Hooks Customizados](#lógica-de-negócio-e-hooks-customizados)
-9. [Convenções de Tipagem e Estilo de Código](#convenções-de-tipagem-e-estilo-de-código)
-10. [Pasta Shared](#pasta-shared)
-11. [Índices / Barrel Files](#índices--barrel-files)
+9. [Componentização e Tamanho de Componentes](#componentização-e-tamanho-de-componentes)
+10. [Convenções de Tipagem e Estilo de Código](#convenções-de-tipagem-e-estilo-de-código)
+11. [Pasta Shared](#pasta-shared)
+12. [Índices / Barrel Files](#índices--barrel-files)
 
 ---
 
@@ -522,6 +523,200 @@ export function useAnswerQuestion(questionId: string) {
 
 ---
 
+## Componentização e Tamanho de Componentes
+
+### Regra Fundamental de Componentização
+
+**Componentes e páginas DEVEM ser bem componentizados, com responsabilidades claras e bem definidas na UI.**
+
+### Limite de Tamanho
+
+**Nenhum componente ou página deve exceder 150 linhas de código.**
+
+Se um componente ou página atingir ou se aproximar de 150 linhas, ele **DEVE** ser quebrado em componentes menores com responsabilidades específicas.
+
+### Princípios de Componentização
+
+1. **Páginas não devem conter HTML extenso**
+   - Páginas devem ser orquestradoras que compõem componentes menores
+   - Toda marcação HTML significativa deve estar em componentes dedicados
+   - Páginas devem focar em composição e fluxo, não em renderização detalhada
+
+2. **Componentes por Responsabilidade**
+   - Cada componente deve ter uma responsabilidade única e clara
+   - Componentes devem ser reutilizáveis quando possível
+   - Separe componentes de apresentação de componentes de container
+
+3. **Quebra Proativa**
+   - Não espere atingir exatamente 150 linhas para quebrar
+   - Se um componente tem múltiplas responsabilidades visuais, quebre-o antes de atingir o limite
+   - Prefira muitos componentes pequenos e focados a poucos componentes grandes
+
+### Estrutura de Componentes
+
+Componentes devem ser organizados hierarquicamente:
+
+```
+ui/components/
+├── FeatureComponent/          # Componente principal de uma feature
+│   ├── FeatureComponent.tsx
+│   ├── FeatureComponentHeader.tsx
+│   ├── FeatureComponentBody.tsx
+│   ├── FeatureComponentFooter.tsx
+│   └── index.ts
+```
+
+### Exemplos
+
+#### ❌ Ruim: Página com muito HTML inline
+
+```typescript
+// app/questionnaire/page.tsx
+export default async function QuestionnairePage() {
+  const session = await getTaskSession();
+  
+  return (
+    <div className="container">
+      <header className="header">
+        <h1>Questionário de Tarefa</h1>
+        <p>Complete as perguntas abaixo</p>
+      </header>
+      
+      <main className="main">
+        <div className="progress-bar">
+          <div className="progress" style={{ width: '50%' }} />
+        </div>
+        
+        <section className="question-section">
+          <h2>{session.currentQuestion.text}</h2>
+          <div className="options">
+            {session.currentQuestion.options.map(option => (
+              <button key={option.id} className="option-button">
+                {option.text}
+              </button>
+            ))}
+          </div>
+        </section>
+        
+        <div className="navigation">
+          <button>Anterior</button>
+          <button>Próxima</button>
+        </div>
+      </main>
+      
+      <footer className="footer">
+        <p>Progresso: 3 de 10 perguntas</p>
+      </footer>
+    </div>
+  );
+}
+```
+
+#### ✅ Bom: Página componentizada
+
+```typescript
+// app/questionnaire/page.tsx
+import { QuestionnaireHeader } from "@/modules/questionnaire/ui/components/QuestionnaireHeader";
+import { QuestionnaireProgress } from "@/modules/questionnaire/ui/components/QuestionnaireProgress";
+import { QuestionSection } from "@/modules/questionnaire/ui/components/QuestionSection";
+import { QuestionnaireNavigation } from "@/modules/questionnaire/ui/components/QuestionnaireNavigation";
+import { QuestionnaireFooter } from "@/modules/questionnaire/ui/components/QuestionnaireFooter";
+
+export default async function QuestionnairePage() {
+  const session = await getTaskSession();
+  
+  return (
+    <div className="container">
+      <QuestionnaireHeader />
+      <QuestionnaireProgress progress={session.progress} />
+      <QuestionSection question={session.currentQuestion} />
+      <QuestionnaireNavigation sessionId={session.id} />
+      <QuestionnaireFooter totalQuestions={session.totalQuestions} />
+    </div>
+  );
+}
+```
+
+#### ✅ Bom: Componente quebrado quando necessário
+
+```typescript
+// ui/components/QuestionCard.tsx (antes - 180 linhas)
+export function QuestionCard({ question }: QuestionCardProps) {
+  // Muito código aqui...
+  return (
+    <div>
+      {/* Muito JSX aqui... */}
+    </div>
+  );
+}
+
+// ui/components/QuestionCard.tsx (depois - 45 linhas)
+import { QuestionCardHeader } from "./QuestionCardHeader";
+import { QuestionCardBody } from "./QuestionCardBody";
+import { QuestionCardActions } from "./QuestionCardActions";
+
+export function QuestionCard({ question }: QuestionCardProps) {
+  return (
+    <div className="question-card">
+      <QuestionCardHeader question={question} />
+      <QuestionCardBody question={question} />
+      <QuestionCardActions question={question} />
+    </div>
+  );
+}
+
+// ui/components/QuestionCardHeader.tsx (30 linhas)
+export function QuestionCardHeader({ question }: QuestionCardHeaderProps) {
+  // Responsabilidade única: header do card
+}
+
+// ui/components/QuestionCardBody.tsx (50 linhas)
+export function QuestionCardBody({ question }: QuestionCardBodyProps) {
+  // Responsabilidade única: corpo do card
+}
+
+// ui/components/QuestionCardActions.tsx (40 linhas)
+export function QuestionCardActions({ question }: QuestionCardActionsProps) {
+  // Responsabilidade única: ações do card
+}
+```
+
+### Quando Quebrar um Componente
+
+Quebre um componente quando:
+
+- ✅ Ele excede ou se aproxima de 150 linhas
+- ✅ Ele tem múltiplas responsabilidades visuais distintas
+- ✅ Partes do componente podem ser reutilizadas em outros lugares
+- ✅ O componente está difícil de ler ou manter
+- ✅ Há lógica condicional complexa que renderiza diferentes seções
+
+### Estrutura de Pastas para Componentes Complexos
+
+Para componentes que precisam ser quebrados em múltiplas partes:
+
+```
+ui/components/
+├── ComplexFeature/
+│   ├── ComplexFeature.tsx          # Componente principal (orquestrador)
+│   ├── ComplexFeatureHeader.tsx
+│   ├── ComplexFeatureContent.tsx
+│   ├── ComplexFeatureSidebar.tsx
+│   ├── ComplexFeatureFooter.tsx
+│   ├── ComplexFeature.types.ts     # Tipos compartilhados
+│   └── index.ts
+```
+
+### Regras de Ouro
+
+1. **150 linhas é o limite absoluto** - Se atingir, quebre imediatamente
+2. **Páginas são compositores** - Elas compõem componentes, não renderizam HTML extenso
+3. **Um componente, uma responsabilidade** - Cada componente deve fazer uma coisa bem feita
+4. **Prefira quebrar cedo** - Não espere atingir o limite para refatorar
+5. **Componentes pequenos são mais testáveis** - Facilita testes unitários e manutenção
+
+---
+
 ## Convenções de Tipagem e Estilo de Código
 
 ### Regras TypeScript
@@ -709,6 +904,9 @@ Ao gerar ou modificar código neste repositório, garanta:
 - ✅ Prefira Server Components; use Client Components apenas quando necessário
 - ✅ Busca client-side usa TanStack Query via hooks customizados
 - ✅ Nenhuma lógica de negócio em componentes; use hooks customizados ou casos de uso
+- ✅ Componentes e páginas não excedem 150 linhas; quebrar em componentes menores quando necessário
+- ✅ Páginas são compositores; não contêm HTML extenso inline
+- ✅ Componentes têm responsabilidades únicas e bem definidas
 - ✅ Todos os tipos/interfaces estão em arquivos separados, não inline
 - ✅ Tipos de props terminam com `Props`, enums terminam com `Enum`
 - ✅ Sem valores mágicos codificados; use constantes
@@ -739,6 +937,7 @@ Sempre que uma IA estiver sendo usada como pair programmer neste projeto (`front
      - [Client vs Server (Next.js)](#client-vs-server-nextjs)
      - [Requisições Client-side com TanStack Query](#requisições-client-side-com-tanstack-query)
      - [Lógica de Negócio e Hooks Customizados](#lógica-de-negócio-e-hooks-customizados)
+     - [Componentização e Tamanho de Componentes](#componentização-e-tamanho-de-componentes)
      - [Convenções de Tipagem e Estilo de Código](#convenções-de-tipagem-e-estilo-de-código)
      - [Pasta Shared](#pasta-shared)
      - [Índices / Barrel Files](#índices--barrel-files)
@@ -763,6 +962,11 @@ Sempre que uma IA estiver sendo usada como pair programmer neste projeto (`front
      - Lógica em **hooks customizados** (UI) ou em casos de uso / serviços de domínio.
    - Componentes que não possuem lógica acima do retorno devem usar a forma enxuta:
      - `const Component = () => (<h1>Hello</h1>)`
+   - **Componentização rigorosa**:
+     - Nenhum componente ou página deve exceder 150 linhas.
+     - Se atingir ou se aproximar de 150 linhas, quebrar em componentes menores.
+     - Páginas devem ser compositores que orquestram componentes, não renderizam HTML extenso.
+     - Cada componente deve ter uma responsabilidade única e clara na UI.
    - Tipagem:
      - Nada de `any`, salvo casos extremamente necessários (e ainda assim, evitar).
      - Não declarar tipos ou interfaces inline em componentes/páginas.

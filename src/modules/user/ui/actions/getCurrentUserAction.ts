@@ -23,4 +23,3 @@ export async function getCurrentUserAction(): Promise<GetAuthenticatedUserResult
 
   return await getAuthenticatedUserUseCase.execute({ sessionToken });
 }
-
