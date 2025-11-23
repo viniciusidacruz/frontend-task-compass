@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Task Compass
 
-## Getting Started
+**Uma bússola de decisão para desenvolvedores front-end antes de iniciar uma tarefa**
 
-First, run the development server:
+---
+
+## 📋 Visão Geral
+
+O **Frontend Task Compass** é uma aplicação Next.js que funciona como uma bússola de decisão e mapa mental para desenvolvedores front-end antes de começar uma tarefa. A aplicação ajuda a esclarecer o tipo de tarefa, requisitos, escopo, riscos, dependências e critérios de aceitação antes da implementação.
+
+Muitas vezes, desenvolvedores começam a trabalhar em uma tarefa sem ter todas as informações necessárias, o que pode levar a retrabalho, bugs e atrasos. Esta ferramenta guia você através de um questionário dinâmico e interativo que revela as perguntas certas baseadas nas suas respostas anteriores.
+
+---
+
+## ✨ Funcionalidades Principais
+
+- **Questionário Dinâmico Multi-etapas**: Cada resposta revela a próxima pergunta, baseada nas escolhas anteriores
+- **Perguntas Condicionais**: O fluxo de perguntas se adapta ao tipo de tarefa selecionado
+- **Tipos de Tarefa**: Suporte para Features, Bugs e Refactors
+- **Clareza de Escopo**: Ajuda a identificar requisitos, dependências e riscos antes da implementação
+- **Critérios de Aceitação**: Guia para definir o que precisa ser feito para considerar a tarefa completa
+
+---
+
+## 🎯 Como Funciona
+
+A aplicação utiliza uma estrutura de árvore de decisão onde:
+
+1. **Primeira Pergunta**: O usuário seleciona o tipo de tarefa (Feature, Bug ou Refactor)
+2. **Perguntas Condicionais**: Baseado na seleção, novas perguntas aparecem dinamicamente
+   - Para **Feature**: "A UX/UI já está definida?", "Existem dependências de backend?", "Há casos extremos ou estados de erro identificados?"
+   - Para **Bug**: Perguntas sobre reprodução, ambiente, impacto, etc.
+   - Para **Refactor**: Perguntas sobre escopo, testes, documentação, etc.
+3. **Resultado Final**: Um resumo das respostas que ajuda a clarificar a tarefa antes de começar a codificar
+
+---
+
+## 🚀 Começando
+
+### Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+- **Node.js** (versão 18 ou superior)
+- **pnpm** (recomendado) ou npm/yarn
+- **Git**
+
+### Instalação
+
+1. **Clone o repositório**:
+
+   ```bash
+   git clone git@github.com:viniciusidacruz/frontend-task-compass.git
+   cd frontend-task-compass
+   ```
+
+2. **Instale as dependências**:
+
+   ```bash
+   pnpm install
+   # ou
+   npm install
+   ```
+
+3. **Execute o servidor de desenvolvimento**:
+
+   ```bash
+   pnpm dev
+   # ou
+   npm run dev
+   ```
+
+4. **Abra no navegador**:
+   Acesse [http://localhost:3000](http://localhost:3000) para ver a aplicação em execução.
+
+### Build para Produção
+
+Para criar uma build de produção:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm build
+pnpm start
+---
+
+## 🛠️ Stack Tecnológica
+
+- **Next.js 16** (App Router) - Framework React para produção
+- **React 19** - Biblioteca para construção de interfaces
+- **TypeScript** - Tipagem estática para JavaScript
+- **Tailwind CSS** - Framework CSS utilitário
+- **ESLint** - Linter para qualidade de código
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Para contribuir:
+
+1. **Fork o projeto**
+2. **Crie uma branch para sua feature** (`git checkout -b feature/nova-funcionalidade`)
+3. **Commit suas mudanças** usando conventional commits (`git commit -m 'feat: adiciona nova funcionalidade'`)
+4. **Push para a branch** (`git push origin feature/nova-funcionalidade`)
+5. **Abra um Pull Request**
+
+### Tipos de Commits (Conventional Commits)
+
+- `feat`: Nova funcionalidade
+- `fix`: Correção de bug
+- `docs`: Documentação
+- `style`: Formatação, ponto e vírgula faltando, etc.
+- `refactor`: Refatoração de código
+- `test`: Adição ou correção de testes
+- `chore`: Mudanças em build, dependências, etc.
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 👤 Autor
+
+**Vinicius da Cruz**
+
+- GitHub: [@viniciusidacruz](https://github.com/viniciusidacruz)
+
+---
+
+## 🙏 Agradecimentos
+
+Este projeto foi criado para ajudar desenvolvedores front-end a terem mais clareza e confiança antes de começar uma tarefa. Se você encontrar útil, considere dar uma ⭐ no repositório!
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
