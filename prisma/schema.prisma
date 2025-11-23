@@ -25,13 +25,35 @@ enum TaskSessionStatusEnum {
   ABANDONED
 }
 
+enum UserRoleEnum {
+  USER
+  ADMIN
+}
+
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
   name          String?
+  passwordHash  String
+  role          UserRoleEnum   @default(USER)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   taskSessions  TaskSession[]
+  sessions      UserSession[]
+}
+
+model UserSession {
+  id           String    @id @default(cuid())
+  userId       String
+  sessionToken String    @unique
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
 }
 
 model TaskSession {
